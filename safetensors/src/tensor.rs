@@ -123,6 +123,7 @@ impl std::error::Error for SafeTensorError {
 struct PreparedData {
     n: u64,
     header_bytes: Vec<u8>,
+    metadata: Metadata,
     offset: usize,
 }
 
@@ -261,6 +262,7 @@ where
         PreparedData {
             n: aligned_metadata_len as u64,
             header_bytes: metadata_buf,
+            metadata,
             offset,
         },
         tensors,
@@ -281,6 +283,7 @@ pub fn serialize<
             n,
             header_bytes,
             offset,
+            ..
         },
         tensors,
     ) = prepare(data, data_info)?;
@@ -317,7 +320,10 @@ where
 {
     let (
         PreparedData {
-            n, header_bytes, ..
+            n,
+            header_bytes,
+            metadata,
+            ..
         },
         tensors,
     ) = prepare(data, data_info)?;
@@ -328,6 +334,11 @@ where
 
     let mut f = std::io::BufWriter::new(std::fs::File::create(filename)?);
     f.write_all(n.to_le_bytes().as_ref())?;
+
+    for tensor_info, tensor in metadata.tensors.iter().zip(tensors) {
+        f.write_all
+    }
+
     f.write_all(&header_bytes)?;
 
     for tensor in tensors {

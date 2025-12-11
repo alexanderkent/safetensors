@@ -33,6 +33,26 @@ pub fn bench_serialize(c: &mut Criterion) {
     });
 }
 
+pub fn bench_serialize_file(c: &mut Criterion) {
+    let (data, shape, dtype) = get_sample_data();
+    let n_layers = 5;
+
+    let mut metadata = HashMap::new();
+    let filename = std::env::temp_dir().join("bench.safetensors");
+    for i in 0..n_layers {
+        let tensor = TensorView::new(dtype, shape.clone(), &data[..]).unwrap();
+        metadata.insert(format!("weight{i}"), tensor);
+    }
+
+    c.bench_function("Serialize 10_MB file", |b| {
+        b.iter(|| {
+            let _serialized = serialize_to_file(&metadata, black_box(None), filename.as_ref());
+        })
+    });
+
+    std::fs::remove_file(filename).unwrap();
+}
+
 pub fn bench_deserialize(c: &mut Criterion) {
     let (data, shape, dtype) = get_sample_data();
     let n_layers = 5;
@@ -53,6 +73,6 @@ pub fn bench_deserialize(c: &mut Criterion) {
     });
 }
 
-criterion_group!(bench_ser, bench_serialize);
+criterion_group!(bench_ser, bench_serialize, bench_serialize_file);
 criterion_group!(bench_de, bench_deserialize);
 criterion_main!(bench_ser, bench_de);

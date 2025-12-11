@@ -23,8 +23,8 @@ exclude = ["rust-toolchain", "target/*", "Cargo.lock"]
 
 [dependencies]
 serde = { version = "1.0", default-features = false, features = [
-    "derive",
-    "alloc",
+  "derive",
+  "alloc",
 ] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 hashbrown = { version = "0.16", features = ["serde"] }
@@ -33,6 +33,7 @@ hashbrown = { version = "0.16", features = ["serde"] }
 criterion = "0.6"
 memmap2 = "0.9"
 proptest = "1.7"
+tempfile = "3"
 
 [features]
 default = ["std"]
